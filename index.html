@@ -3,14 +3,103 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Hangman Game</title>
   </head>
+
   <body>
-    <h1>Hangman</h1>
+    <h2>Guess the Word</h2>
+    <p id="wordDisplay"></p>
+
+    <input type="text" id="inputBox" maxlength="1" />
+    <button id="btn">Guess</button>
+
+    <p>Right Letters: <span id="rightLetters"></span></p>
+    <p>Wrong Letters: <span id="wrongLetters"></span></p>
+    <p>Attempts Left: <span id="attemptsLeft">6</span></p>
+
     <script>
-      const array = ["Python", "Java", "PHP", "CSS", "Tailwind"];
-      const newArr = array[Math.floor(Math.random() * array.length)];
-      console.log(newArr);
+      //Dom
+      const wordDisplay = document.getElementById("wordDisplay");
+      const rightLetters = document.getElementById("rightLetters");
+      const wrongLetters = document.getElementById("wrongLetters");
+      const attemptsLeftsDisplay = document.getElementById("attemptsLeft");
+      const btn = document.getElementById("btn");
+      const inputBox = document.getElementById("inputbox");
+
+      //Game Stateges
+      const wordsArray = ["Java", "Python", "HTML", "CSS", "React"];
+      const randomWord =
+        wordsArray[Math.floor(Math.random() * wordsArray.length)];
+      console.log("Random Word :", randomWord);
+
+      const rightLetterArray = [];
+      const wrongLettersArray = [];
+      const maxAttempts = 6;
+      let gameOver = false;
+
+      function updateWordDisplay() {
+        let displayString = "";
+        let isWinner = true;
+
+        for (let i = 0; i < randomWord.length; i++) {
+          const char = randomWord[i].toLowerCase();
+          if (rightLetterArray.includes(char)) {
+            displayString += randomWord[i] + " ";
+          } else {
+            displayString += "_ ";
+            isWinner = false;
+          }
+        }
+        wordDisplay.textContent = displayString.trim();
+
+        if (isWinner && rightLetterArray.length > 0) {
+          alert("Congratulations! You guessed the word: " + randomWord);
+          gameOver = true;
+        }
+      }
+      //to show the blank word once start
+      updateWordDisplay();
+
+      //Guessing Logic
+      function handleGuess() {
+        if (gameOver) return;
+        const input = inputBox.value.toLowerCase();
+        inputBox.value = "";
+        inputBox.focus();
+
+        if (!input || !input.match(/[a-z0-9]/i)) return;
+
+        if (rightLetterArray.includes(input) || wrongLetters.includes(input)) {
+          alert("You already guessed that letter!");
+          return;
+        }
+
+        //check if correct or wrong
+        if (randomWord.toLowerCase().includes(input)) {
+          rightLetterArray.push(input);
+          rightLetterArray.textContent = rightLetterArray.join(", ");
+          updateWordDisplay();
+        } else {
+          wrongLettersArray.push(input);
+          wrongLettersArray.textContent = wrongLettersArray.join(", ");
+
+          const attemptsLeft = maxAttempts - wrongLetters.length;
+          attemptsLeftsDisplay.textContent = attemptsLeft;
+
+          if (attemptsLeft === 0) {
+            alert("Game Over! The word was: " + randomWord);
+            gameOver = true;
+          }
+        }
+      }
+
+      btn.addEventListener("click", handleGuess);
+
+      inputBox.addEventListener("keypress", (e) => {
+        if (e === "Enter") {
+          handleGuess();
+        }
+      });
     </script>
   </body>
 </html>

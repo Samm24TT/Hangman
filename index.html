@@ -4,8 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hangman Game</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      #wordDisplay {
+        font-size: 24px;
+        letter-spacing: 5px;
+        font-weight: bold;
+      }
+    </style>
   </head>
-
   <body>
     <h2>Guess the Word</h2>
     <p id="wordDisplay"></p>
@@ -24,13 +34,13 @@
       const wrongLetters = document.getElementById("wrongLetters");
       const attemptsLeftsDisplay = document.getElementById("attemptsLeft");
       const btn = document.getElementById("btn");
-      const inputBox = document.getElementById("inputbox");
+      const inputBox = document.getElementById("inputBox");
 
       //Game Stateges
       const wordsArray = ["Java", "Python", "HTML", "CSS", "React"];
       const randomWord =
         wordsArray[Math.floor(Math.random() * wordsArray.length)];
-      console.log("Random Word :", randomWord);
+      console.log("Random Word :", randomWord); // for debug
 
       const rightLetterArray = [];
       const wrongLettersArray = [];
@@ -69,7 +79,10 @@
 
         if (!input || !input.match(/[a-z0-9]/i)) return;
 
-        if (rightLetterArray.includes(input) || wrongLetters.includes(input)) {
+        if (
+          rightLetterArray.includes(input) ||
+          wrongLettersArray.includes(input)
+        ) {
           alert("You already guessed that letter!");
           return;
         }
@@ -77,13 +90,13 @@
         //check if correct or wrong
         if (randomWord.toLowerCase().includes(input)) {
           rightLetterArray.push(input);
-          rightLetterArray.textContent = rightLetterArray.join(", ");
+          rightLetters.textContent = rightLetterArray.join(", ");
           updateWordDisplay();
         } else {
           wrongLettersArray.push(input);
-          wrongLettersArray.textContent = wrongLettersArray.join(", ");
+          wrongLetters.textContent = wrongLettersArray.join(", ");
 
-          const attemptsLeft = maxAttempts - wrongLetters.length;
+          const attemptsLeft = maxAttempts - wrongLettersArray.length;
           attemptsLeftsDisplay.textContent = attemptsLeft;
 
           if (attemptsLeft === 0) {
@@ -96,7 +109,7 @@
       btn.addEventListener("click", handleGuess);
 
       inputBox.addEventListener("keypress", (e) => {
-        if (e === "Enter") {
+        if (e.key === "Enter") {
           handleGuess();
         }
       });

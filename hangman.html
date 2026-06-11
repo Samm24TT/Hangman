@@ -3,132 +3,101 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Word Guessing Game</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        padding: 20px;
-      }
-      #wordDisplay {
-        font-size: 24px;
-        letter-spacing: 5px;
-        font-weight: bold;
-      }
-    </style>
+    <title>HangGame</title>
   </head>
-
   <body>
-    <h2>Guess the Word</h2>
-    <p id="wordDisplay"></p>
-
-    <input type="text" id="inputBox" maxlength="1" autofocus />
-    <button id="btn">Guess</button>
-
-    <p>Right Letters: <span id="rightLettersDisplay"></span></p>
-    <p>Wrong Letters: <span id="wrongLettersDisplay"></span></p>
-    <p>Attempts Left: <span id="attemptsLeftDisplay">6</span></p>
+    <input id="inputBox" type="text" maxlength="1" autofocus />
+    <button id="guessBtn">Guess</button>
+    <p id="lettersCount"></p>
+    <p id="rightLetters">Right letters: <span></span></p>
+    <p id="wrongLetters">Wrong letters: <span></span></p>
 
     <script>
-      // 1. DOM Elements
-      const wordDisplay = document.getElementById("wordDisplay");
-      const rightLettersDisplay = document.getElementById(
-        "rightLettersDisplay",
-      );
-      const wrongLettersDisplay = document.getElementById(
-        "wrongLettersDisplay",
-      );
-      const attemptsLeftDisplay = document.getElementById(
-        "attemptsLeftDisplay",
-      );
-      const btn = document.getElementById("btn");
-      const inputBox = document.getElementById("inputBox");
+      const inputBox = document.querySelector("#inputBox");
+      const guessBtn = document.querySelector("#guessBtn");
+      const rightLetter = document.querySelector("#rightLetters span");
+      const wrongLetter = document.querySelector("#wrongLetters span");
+      const lettersCount = document.getElementById("lettersCount");
 
-      // 2. Game State Variables
-      const wordsArray = ["Java", "Python", "HTML", "CSS", "React"];
-      const randomWord =
-        wordsArray[Math.floor(Math.random() * wordsArray.length)];
-      console.log("Cheat code (Random Word):", randomWord); // Kept for your debugging
+      const array = ["Java", "Python", "HTML", "CSS", "React"];
 
-      const rightLetterArray = [];
-      const wrongLetterArray = [];
-      const maxAttempts = 6;
+      let originalWord = array[Math.floor(Math.random() * array.length)];
+      let randomWord = originalWord.toLowerCase();
+      console.log(randomWord);
+
+      let rightLetters = []; // css
+      let wrongLetters = [];
+      let maxWrong = 6;
       let gameOver = false;
 
-      // 3. Initialize the word display with blanks
-      function updateWordDisplay() {
-        let displayString = "";
-        let isWinner = true;
+      console.log(array.length);
 
-        for (let i = 0; i < randomWord.length; i++) {
-          const char = randomWord[i].toLowerCase();
-          if (rightLetterArray.includes(char)) {
-            displayString += randomWord[i] + " "; // Show actual casing
-          } else {
-            displayString += "_ ";
-            isWinner = false; // If there's a blank, they haven't won yet
-          }
-        }
-        wordDisplay.textContent = displayString.trim();
+      function display() {
+        let letters = randomWord
+          .split("") //string => array ["j", "a","v","a"]
+          .map((l) => (rightLetters.includes(l) ? l : "_"));
+        lettersCount.textContent = letters.join(" ");
 
-        // Check for Win
-        if (isWinner && rightLetterArray.length > 0) {
-          alert("Congratulations! You guessed the word: " + randomWord);
+        // if (!letters.includes("_") && !gameOver) {
+        //   alert(`Congratulation! You won. The word was ${originalWord}`);
+        //   gameOver = true;
+        // }
+      }
+
+      display();
+
+      function checkLose() {
+        if (wrongLetters.length >= maxWrong) {
+          alert(`Game over ! The correct word was ${randomWord}`);
           gameOver = true;
+          return;
         }
       }
 
-      // Run once at start to show blanks
-      updateWordDisplay();
+      function checkWon() {
+        let won = randomWord.split("").every((l) => rightLetters.includes(l));
+        console.log("Won", won);
+        if (won) {
+          //output is true or false
+          alert("You won!");
+          gameOver = true;
+          return;
+        }
+      }
+      checkWon();
 
-      // 4. Main Guessing Logic
-      function handleGuess() {
-        if (gameOver) return; // Stop if game is already over
+      guessBtn.addEventListener("click", () => {
+        if (gameOver) return;
+        let input = inputBox.value.toLowerCase();
 
-        const input = inputBox.value.toLowerCase();
-        inputBox.value = ""; // Clear input immediately
-        inputBox.focus(); // Keep cursor in the box
+        if (!input) return;
 
-        // Validate input
-        if (!input || !input.match(/[a-z0-9]/i)) return;
-
-        // Check for duplicate guesses
-        if (
-          rightLetterArray.includes(input) ||
-          wrongLetterArray.includes(input)
-        ) {
-          alert("You already guessed that letter!");
+        if (rightLetters.includes(input) || wrongLetters.includes(input)) {
+          alert("It've already done.");
+          inputBox.value = "";
           return;
         }
 
-        // Check if correct or wrong
-        if (randomWord.toLowerCase().includes(input)) {
-          rightLetterArray.push(input);
-          rightLettersDisplay.textContent = rightLetterArray.join(", ");
-          updateWordDisplay();
+        console.log("wrong count", wrongLetters.length);
+
+        if (randomWord.includes(input)) {
+          rightLetters.push(input);
+          console.log("Right", rightLetters);
+
+          rightLetter.textContent = rightLetters.join(" ");
+
+          // join() array => string
         } else {
-          wrongLetterArray.push(input);
-          wrongLettersDisplay.textContent = wrongLetterArray.join(", ");
+          wrongLetters.push(input);
+          console.log("Wrong", wrongLetters);
 
-          // Update attempts left
-          const attemptsLeft = maxAttempts - wrongLetterArray.length;
-          attemptsLeftDisplay.textContent = attemptsLeft;
-
-          // Check for Loss
-          if (attemptsLeft === 0) {
-            alert("Game Over! The word was: " + randomWord);
-            gameOver = true;
-          }
+          wrongLetter.textContent = wrongLetters.join(" ");
         }
-      }
+        inputBox.value = "";
 
-      // 5. Event Listeners
-      btn.addEventListener("click", handleGuess);
-
-      // Allow pressing "Enter" to submit guess
-      inputBox.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-          handleGuess();
-        }
+        display();
+        checkWon();
+        checkLose();
       });
     </script>
   </body>

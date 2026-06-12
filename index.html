@@ -6,26 +6,76 @@
     <title>Hangman Game</title>
     <style>
       body {
-        font-family: sans-serif;
-        padding: 20px;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        display: flex;
+        justify-content: center;
+        height: 100vh;
+        align-items: center;
+        background: #020024;
+        background: linear-gradient(
+          90deg,
+          rgba(2, 0, 36, 1) 0%,
+          rgba(9, 9, 121, 1) 37%,
+          rgba(0, 212, 255, 1) 100%
+        );
       }
+
+      main {
+        width: 500px;
+        height: 400px;
+        text-align: center;
+        background: #22c1c3;
+        background: linear-gradient(
+          0deg,
+          rgba(34, 193, 195, 1) 27%,
+          rgba(253, 187, 45, 1) 75%
+        );
+      }
+
       #wordDisplay {
         font-size: 24px;
         letter-spacing: 5px;
         font-weight: bold;
       }
+
+      #hangman {
+        white-space: pre;
+        padding: 0 20px;
+        font-family: monospace;
+        text-align: left;
+        display: inline-block;
+        background-color: azure;
+      }
+
+      input,
+      button {
+        border: none;
+      }
+
+      input {
+        width: 120px;
+        height: 23px;
+        text-align: center;
+      }
+
+      button {
+        height: 25px;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
-    <h2>Guess the Word</h2>
-    <p id="wordDisplay"></p>
+    <main>
+      <h2>Guess the Word</h2>
+      <div id="hangman"></div>
+      <p id="wordDisplay"></p>
+      <input type="text" id="inputBox" maxlength="1" autofocus />
+      <button id="btn">Guess</button>
 
-    <input type="text" id="inputBox" maxlength="1" />
-    <button id="btn">Guess</button>
-
-    <p>Right Letters: <span id="rightLetters"></span></p>
-    <p>Wrong Letters: <span id="wrongLetters"></span></p>
-    <p>Attempts Left: <span id="attemptsLeft">6</span></p>
+      <p>Right Letters: <span id="rightLetters"></span></p>
+      <p>Wrong Letters: <span id="wrongLetters"></span></p>
+      <p>Attempts Left: <span id="attemptsLeft">6</span></p>
+    </main>
 
     <script>
       //Dom
@@ -35,6 +85,56 @@
       const attemptsLeftsDisplay = document.getElementById("attemptsLeft");
       const btn = document.getElementById("btn");
       const inputBox = document.getElementById("inputBox");
+      const actionDisplay = document.getElementById("hangman");
+
+      const STAGES = [
+        `  _
+        |   |
+        |
+        |
+        |
+      __|__`,
+        `  _
+        |   |
+        |   O
+        |
+        |
+      __|__`,
+        `  _
+        |   |
+        |   O
+        |   |
+        |
+      __|__`,
+        `  _
+        |   |
+        |   O
+        |  /|
+        |
+      __|__`,
+        `  _
+        |   |
+        |   O
+        |  /|\\
+        |
+      __|__`,
+        `  _
+        |   |
+        |   O
+        |  /|\\
+        |  /
+      __|__`,
+        `  _
+        |   |
+        |   O
+        |  /|\\
+        |  / \\
+      __|__`,
+      ];
+
+      function drawHandman() {
+        actionDisplay.textContent = STAGES[wrongLettersArray.length];
+      }
 
       //Game Stateges
       const wordsArray = ["Java", "Python", "HTML", "CSS", "React"];
@@ -69,6 +169,7 @@
       }
       //to show the blank word once start
       updateWordDisplay();
+      drawHandman();
 
       //Guessing Logic
       function handleGuess() {
@@ -98,6 +199,7 @@
 
           const attemptsLeft = maxAttempts - wrongLettersArray.length;
           attemptsLeftsDisplay.textContent = attemptsLeft;
+          drawHandman();
 
           if (attemptsLeft === 0) {
             alert("Game Over! The word was: " + randomWord);
